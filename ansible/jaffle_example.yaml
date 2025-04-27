@@ -2,6 +2,25 @@
   hosts: dbt
   become: True
   tasks:
-  - name: Pull dbt Docker image
-    community.docker.docker_image_pull:
-      name: ghcr.io/dbt-labs/dbt-core:latest
+    - name: Include app variables
+      include_vars: vars.yaml
+
+    - name: Clone example repo
+      ansible.builtin.git:
+        repo: 'https://github.com/dbt-labs/jaffle_shop_duckdb.git'
+        dest: '/home/{{ user_name }}/dbt_example/'
+
+    - name: Update and upgrade apt packages
+      apt:
+        upgrade: yes
+
+    - name: Install pip & venv
+      package:
+        name: python3-pip, python3-venv
+        state: present
+
+    - name: Install specified python requirements
+      ansible.builtin.pip:
+        requirements: '/home/{{ user_name }}/dbt_example/requirements.txt'
+        virtualenv: /opt/website-venv
+        virtualenv_command: /usr/bin/python3 -m venv
