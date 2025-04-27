@@ -1,0 +1,7 @@
+- name: jaffle example
+  hosts: dbt
+  become: True
+  tasks:
+  - name: Pull dbt Docker image
+    community.docker.docker_image_pull:
+      name: ghcr.io/dbt-labs/dbt-core:latest
